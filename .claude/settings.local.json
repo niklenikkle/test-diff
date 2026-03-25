@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"D:/aipro/ai05/审核结果/202603201652/db_query_service\")",
+      "Bash(mkdir -p \"D:/aipro/ai05/审核结果/202603201652/knowledge_base\")"
+    ]
+  }
+}
