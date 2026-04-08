@@ -286,6 +286,16 @@ model: sonnet
 
 当进入正式差异审查时，应按 `diff_review/` 标准格式落盘；当进入全量扫描时，应按 `repo_review/` 标准格式落盘。
 
+正式模式下，LLM 不再直接手写完整大 JSON / 完整 Markdown 报告，而是先产出**文件级中间结果**，再交由 `scripts/assemble-review-output.py` 统一聚合、模板填充、统计计数与落盘。
+
+中间结果最小约定：
+
+- 顶层包含本次模式所需元信息（如 `repo_path`、`commit_info`、`references_used`、`languages`、`diff_payload` 等）
+- `file_results` 必须覆盖本次纳入正式审查的每个文件
+- `file_results[*]` 至少包含：`file_path`、`status_code`、`issues`、`report`
+- 每个 `issues[*]` 至少包含：`title`、`type`、`severity`、`description`、`location`、`start_line`、`end_line`、`evidence`、`suggestion`
+- clean file 也必须保留文件项；若未显式补全，聚合脚本会统一兜底为 `status_code=0`、`issues=[]`、`report="未发现值得报告的高置信度问题"`
+
 #### diff_review 正式差异审查
 
 - 全局结果文件：`diff_review/<output_name>/repo_result.json`
@@ -304,6 +314,8 @@ model: sonnet
   - 有可信 usage 统计源时填写真实数据
   - 没有可信 usage 统计源时，必须显式写成“未采集”，不要用 `0` 充数
   - 推荐写法：`"llm_usage": { "collected": false, "reason": "本次审查未接入统一 usage 统计链路" }`
+- 正式差异审查落盘时，必须调用：`python scripts/assemble-review-output.py --mode diff --input <中间结果.json> --output-dir <diff_review/<output_name>>`
+- 脚本生成 `review_result.json` 后，必须继续执行内置校验；校验未通过时不得宣称审查完成
 
 #### repo_review 仓库级审查
 
@@ -315,8 +327,10 @@ model: sonnet
   - `review_output/`
 - `review_output/` 下应尽量保留原仓库目录结构
 - 单文件结果应写为：`review_output/<原路径>_review.json`
+- 仓库级正式审查落盘时，必须调用：`python scripts/assemble-review-output.py --mode repo --input <中间结果.json> --output-dir <repo_review/<output_name>>`
 
 如果未发现值得报告的问题，也必须生成对应模式要求的完整产物，并明确写出“未发现值得报告的高置信度问题”。
+
 
 ## 何时给代码示例
 
@@ -348,12 +362,14 @@ model: sonnet
    - 必须生成提交级结果目录：`commits_result/`
    - 每笔提交必须落到：`commits_result/<revision_number>_reviewer_<author>/`
    - 每笔提交目录下必须包含：`diff.json`、`review_result.json`、`report.md`
+   - 不要让 LLM 直接手写这些正式产物；应先整理提交级中间结果 JSON，再调用 `scripts/assemble-review-output.py --mode diff` 生成正式文件
 2. 若当前任务是仓库级审查，必须按 `repo_review/` 标准格式落盘：
    - 在统一审核输出根目录下创建 `repo_review/`，默认根目录为 `C:/Users/<username>/AppData/Local/magico/code-review/`
    - 在 `repo_review/<output_name>/` 下生成本次仓库级审查结果
    - 必须生成：`repo_summary.txt`、`repo_result.json`、`review_report.md`
    - 必须生成 `review_output/` 目录，并尽量保留原仓库目录结构
    - 单文件结果应写为：`review_output/<原路径>_review.json`
+   - 不要让 LLM 直接手写这些正式产物；应先整理仓库级中间结果 JSON，再调用 `scripts/assemble-review-output.py --mode repo` 生成正式文件
 3. 若当前任务是基于 `svn-url` 的差异审查：
    - 必须先通过运行时命令读取该 URL 的实际 `svn info` / `svn log` 结果，再决定 revision、author 和审查范围
    - 若用户未显式提供 revision，则必须先读取该 URL 最近一次可见提交，再围绕这次提交生成 `diff_review/` 产物
@@ -391,11 +407,13 @@ model: sonnet
 使用这些模板时：
 
 - 先用 reference 完成审查判断，再用模板组织输出，不要反过来只套模板
+- 正式模式下，LLM 的职责是输出文件级审查结论和必要元信息；统计汇总、clean file 补全、模板填充、Markdown 渲染、JSON 落盘统一由 `scripts/assemble-review-output.py` 负责
 - JSON 产物必须严格沿用模板中的字段名与层级结构，不要自行改名、删字段，或额外再造一套平行结构
 - 对于正式差异审查中的 `review_result.json`，默认按提交维度汇总；`file_review_result` 中每个元素对应一个变更文件，`report` 为该文件的单段总结，`issues` 为该文件下的问题列表；不要回退到 `project_path` + `files[]` 的旧结构
 - `file_review_result` 必须覆盖本次纳入正式审查的每个变更文件；即使某文件未发现值得报告的问题，也应保留该文件项，并将 `status_code` 设为 `0`
 - `status_code` 语义必须固定：`0` 表示该文件未发现值得报告的高置信度问题，`1` 表示该文件存在正式问题；`review_failed_count` 表示 `status_code != 0` 的文件数，不表示审查执行异常数
-- 正式差异审查生成 `review_result.json` 后，必须运行 `python scripts/validate-review-json.py <review_result.json>` 做结构校验；校验未通过时不得宣称审查完成
+- 正式差异审查生成中间结果后，必须通过 `python scripts/assemble-review-output.py --mode diff --input <中间结果.json> --output-dir <目标目录>` 生成正式产物；脚本内部会继续调用 `python scripts/validate-review-json.py <review_result.json>` 做结构校验，校验未通过时不得宣称审查完成
+- 对于仓库级正式审查，必须通过 `python scripts/assemble-review-output.py --mode repo --input <中间结果.json> --output-dir <目标目录>` 生成 `repo_summary.txt`、`repo_result.json`、`review_report.md` 与 `review_output/**/_review.json`
 - 对于 `repo_review/<output_name>/review_output/<原路径>_review.json`，单文件结果应参考 `assets/per-file-review-template.json`，保持 `file_path`、`status_code`、`issues`、`report` 这 4 个字段
 - `repo_result.json` 默认参考 `assets/repo-result-template.json`；若 `llm_usage` 无可信统计源，必须把整个 `llm_usage` 对象替换为 `{"collected": false, "reason": "本次审查未接入统一 usage 统计链路"}`，不要保留模板中的 0 值统计字段
 - 若模板中包含 `llm_usage` 一类统计字段，只有拿到可信运行时统计时才填写真实值；未采集时必须明确标记“未采集”，不要机械填 `0`
