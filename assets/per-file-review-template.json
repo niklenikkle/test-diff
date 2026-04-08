@@ -1,0 +1,18 @@
+{
+  "file_path": "<相对路径>",
+  "status_code": 0,
+  "issues": [
+    {
+      "title": "<问题标题>",
+      "type": "安全",
+      "severity": "高级",
+      "description": "<问题描述>",
+      "location": "<文件路径:起止行>",
+      "start_line": 0,
+      "end_line": 0,
+      "evidence": "<证据链>",
+      "suggestion": "<修复建议>"
+    }
+  ],
+  "report": "<该文件的总体结论；若无问题则写未发现值得报告的高置信度问题>"
+}

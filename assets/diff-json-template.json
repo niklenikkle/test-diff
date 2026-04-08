@@ -1,0 +1,36 @@
+{
+  "svn_commit": {
+    "info": {
+      "revision": "<REV>",
+      "author": "<author>",
+      "date": "<YYYY-MM-DD HH:mm:ss>",
+      "message": "<commit_message>"
+    },
+    "changed_files": [
+      {
+        "path": "<相对路径>",
+        "action": "M",
+        "action_desc": "修改"
+      }
+    ],
+    "changed_files_count": 1,
+    "total_added_lines": 0,
+    "total_removed_lines": 0
+  },
+  "file_diffs": [
+    {
+      "file_path": "<相对路径>",
+      "action": "M",
+      "action_desc": "修改",
+      "added_lines": 0,
+      "removed_lines": 0,
+      "diff_content": "<unified diff>",
+      "file_extension": "py",
+      "is_binary": false
+    }
+  ],
+  "repo_url": "<repository_root>",
+  "svn_url": "<target_url>",
+  "branch": "<branch_or_path>",
+  "tags": []
+}

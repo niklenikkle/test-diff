@@ -1,0 +1,38 @@
+{
+  "repo_path": "<仓库路径或 svn-url@rREV>",
+  "repo_summary": "<本次差异审查或仓库级审查的全局摘要>",
+  "file_count": 0,
+  "issue_count": 0,
+  "severity_count_dict": {
+    "高危": 0,
+    "中危": 0,
+    "低危": 0
+  },
+  "type_count_dict": {
+    "业务逻辑": 0,
+    "安全": 0,
+    "代码质量": 0,
+    "性能": 0
+  },
+  "llm_usage": {
+    "summary": {
+      "total_request": 0,
+      "success_count": 0,
+      "fail_count": 0
+    },
+    "tokens": {
+      "total_input": 0,
+      "total_output": 0,
+      "total_sum": 0,
+      "avg_input": 0,
+      "avg_output": 0
+    },
+    "performance": {
+      "total_duration_ms": 0,
+      "avg_duration_ms": 0,
+      "max_duration_ms": 0,
+      "min_duration_ms": 0,
+      "avg_ttft_ms": 0
+    }
+  }
+}

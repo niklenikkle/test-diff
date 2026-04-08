@@ -1,0 +1,39 @@
+{
+  "revision": "<REV>",
+  "message": "<commit_message>",
+  "author": "<author>",
+  "file_count": 0,
+  "issue_count": 0,
+  "review_failed_count": 0,
+  "severity_count_dict": {
+    "高危": 0,
+    "中危": 0,
+    "低危": 0
+  },
+  "type_count_dict": {
+    "业务逻辑": 0,
+    "安全": 0,
+    "代码质量": 0,
+    "性能": 0
+  },
+  "file_review_result": [
+    {
+      "file_path": "<相对路径>",
+      "status_code": 0,
+      "issues": [
+        {
+          "title": "<问题标题>",
+          "type": "安全",
+          "severity": "高级",
+          "description": "<问题描述>",
+          "location": "<文件路径:起止行>",
+          "start_line": 0,
+          "end_line": 0,
+          "evidence": "<证据链>",
+          "suggestion": "<修复建议>"
+        }
+      ],
+      "report": "<该文件的总体结论>"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "project_root": "sample-project",
+  "files": [
+    {
+      "path": "svn_commit_record.json",
+      "extension": ".json",
+      "size": 2200,
+      "lines": 90
+    },
+    {
+      "path": "src/app.min.js",
+      "extension": ".js",
+      "size": 1200,
+      "lines": 10
+    },
+    {
+      "path": "src/service.generated.py",
+      "extension": ".py",
+      "size": 2400,
+      "lines": 120
+    },
+    {
+      "path": "package-lock.json",
+      "extension": ".json",
+      "size": 8000,
+      "lines": 300
+    },
+    {
+      "path": "tests/test_api.py",
+      "extension": ".py",
+      "size": 5000,
+      "lines": 220
+    },
+    {
+      "path": "docs/README.md",
+      "extension": ".md",
+      "size": 1500,
+      "lines": 80
+    },
+    {
+      "path": "config/settings.yaml",
+      "extension": ".yaml",
+      "size": 900,
+      "lines": 40
+    },
+    {
+      "path": "src/huge_service.py",
+      "extension": ".py",
+      "size": 700000,
+      "lines": 1200
+    },
+    {
+      "path": "src/core.py",
+      "extension": ".py",
+      "size": 3000,
+      "lines": 120
+    }
+  ]
+}
